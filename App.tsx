@@ -296,7 +296,7 @@ const App: React.FC = () => {
                       <div className="flex-1 min-w-0">
                         <p className="font-mono text-cyan-100 truncate text-sm">{item.filename}</p>
                         <div className="flex justify-between items-center mt-1 text-slate-500 text-xs font-mono">
-                          <span className="uppercase text-[10px]">{item.type === 'upload' ? '> UPLOADED' : '> EXTRACTED'}</span>
+                          <span className="uppercase text-[10px]">{item.type === 'upload' ? '&gt; UPLOADED' : '&gt; EXTRACTED'}</span>
                           <span>{new Date(item.timestamp).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12: false})}</span>
                         </div>
                       </div>
@@ -414,7 +414,7 @@ const App: React.FC = () => {
                         <svg className="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                         DOWNLOAD DATA
                       </a>
-                      <button onClick={reset} className="w-full text-slate-500 font-mono hover:text-cyan-400 uppercase tracking-[0.2em] text-xs py-2 transition-colors">>> RESTART SEQUENCE</button>
+                      <button onClick={reset} className="w-full text-slate-500 font-mono hover:text-cyan-400 uppercase tracking-[0.2em] text-xs py-2 transition-colors">&gt;&gt; RESTART SEQUENCE</button>
                     </div>
                   )}
 
