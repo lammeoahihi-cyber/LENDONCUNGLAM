@@ -7,31 +7,78 @@ import { ACCEPTED_FILE_TYPES } from './constants';
 const MAX_FILES = 5;
 const STORAGE_KEY = 'len_don_cung_lam_history_v2';
 
-// Hiệu ứng 1: Bong bóng nước sủi bọt (làm sáng và trong hơn)
-const BubbleEffect = () => {
-  const bubbles = Array.from({ length: 30 }).map((_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    size: Math.random() * 12 + 6,
-    duration: `${5 + Math.random() * 7}s`,
-    delay: `${Math.random() * 5}s`,
-  }));
+// 1. San hô và Rong biển (Vẽ bằng SVG)
+const Coral: React.FC<{ className?: string, style?: any }> = ({ className, style }) => (
+  <svg className={className} style={style} viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M50,100 Q50,70 30,50 Q20,40 15,20 M50,100 Q50,70 70,50 Q85,35 90,15 M50,90 Q65,60 55,40 Q50,25 60,10 M48,80 Q35,65 40,45 Q45,30 35,15" />
+  </svg>
+);
+
+const SeaGrass: React.FC<{ className?: string, style?: any }> = ({ className, style }) => (
+  <svg className={className} style={style} viewBox="0 0 50 100" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round">
+    <path d="M25,100 Q35,75 25,50 T25,0 M25,100 Q15,75 25,60 T15,20 M25,100 Q40,80 30,65 T40,30" />
+  </svg>
+);
+
+// 2. Hệ sinh thái Đáy biển (Đá + San hô)
+const SeaBed = () => (
+  <div className="fixed bottom-0 left-0 w-full h-[35vh] pointer-events-none z-0 flex items-end justify-between overflow-hidden">
+    {/* Vùng tối dưới đáy tảng đá */}
+    <div className="absolute bottom-0 w-full h-16 bg-gradient-to-t from-cyan-900/40 to-transparent z-0"></div>
+
+    {/* Góc Trái: Đá, San hô hồng và Rong biển */}
+    <div className="relative w-1/2 h-full flex items-end z-10">
+      <SeaGrass className="absolute bottom-10 left-32 w-16 h-28 text-emerald-500/50 animate-sway-slow" style={{animationDelay: '0.5s'}} />
+      <Coral className="absolute bottom-2 left-10 w-32 h-40 animate-sway text-pink-500/60 drop-shadow-md" />
+      <Coral className="absolute bottom-8 left-28 w-24 h-32 animate-sway text-purple-400/60 drop-shadow-md" style={{animationDelay: '1s'}} />
+      <svg className="absolute -bottom-16 -left-16 w-80 h-56 text-cyan-800/40 drop-shadow-xl" viewBox="0 0 200 200" fill="currentColor">
+        <path d="M45.7,-76.4C58.9,-69.3,69.1,-55.3,77.3,-40.7C85.5,-26.1,91.8,-11,90.2,3.3C88.6,17.6,79.1,31,69.5,43.2C59.9,55.4,50.3,66.4,37.8,73.4C25.3,80.4,9.9,83.4,-4.8,80.1C-19.5,76.8,-33.4,67.2,-46.8,57.1C-60.2,47,-73,36.4,-80.7,21.8C-88.4,7.2,-91,-11.3,-84.9,-27C-78.8,-42.7,-64.1,-55.5,-49,-61.7C-33.9,-67.9,-17,-67.5,-0.6,-66.5C15.8,-65.5,31.6,-64,45.7,-76.4Z" />
+      </svg>
+    </div>
+
+    {/* Góc Phải: Đá và San hô cam */}
+    <div className="relative w-1/2 h-full flex items-end justify-end z-10">
+      <SeaGrass className="absolute bottom-16 right-40 w-20 h-32 text-teal-500/50 animate-sway-slow" style={{animationDelay: '1.2s'}} />
+      <Coral className="absolute bottom-4 right-16 w-36 h-48 animate-sway text-orange-400/60 drop-shadow-md" style={{animationDelay: '0.3s', transform: 'scaleX(-1)'}} />
+      <svg className="absolute -bottom-20 -right-10 w-96 h-64 text-cyan-900/30 drop-shadow-2xl" viewBox="0 0 200 200" fill="currentColor">
+        <path d="M51.8,-71.4C66.5,-61.9,77.3,-46.1,83,-28.9C88.7,-11.7,89.3,6.9,83.5,23.3C77.7,39.7,65.5,53.9,50.8,63.1C36.1,72.3,18.1,76.5,0.8,75.4C-16.5,74.3,-33,67.9,-47.5,58.3C-62,48.7,-74.5,35.9,-81.4,20.1C-88.3,4.3,-89.6,-14.5,-83.1,-30.3C-76.6,-46.1,-62.3,-58.9,-46.9,-68.2C-31.5,-77.5,-15.8,-83.3,1.1,-84.8C18,-86.3,36,-83.5,51.8,-71.4Z" />
+      </svg>
+    </div>
+  </div>
+);
+
+// 3. Sinh vật phù du phát sáng lấp lánh (Bioluminescence)
+const GlowingCreatures = () => {
+  const creatures = Array.from({ length: 45 }).map((_, i) => {
+    const isCyan = Math.random() > 0.5;
+    const size = Math.random() * 4 + 2;
+    return {
+      id: i,
+      left: `${Math.random() * 100}%`,
+      bottom: `${Math.random() * 100}%`,
+      size: size,
+      duration: `${3 + Math.random() * 5}s`,
+      delay: `${Math.random() * 5}s`,
+      color: isCyan ? '#22d3ee' : '#34d399', // Phát sáng xanh dương hoặc xanh lá
+      shadowSize: size * 3
+    };
+  });
 
   return (
-    // Nền chuyển sang màu xanh ngọc sáng hơn
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-gradient-to-b from-cyan-300 via-sky-100 to-cyan-400">
-      {/* Hiệu ứng ánh nắng phản chiếu qua nước (Caustics) */}
-      <div className="absolute inset-0 opacity-10 bg-[url('https://images.unsplash.com/photo-1518005068251-37900150dfca?q=80&w=1600&auto=format&fit=crop')] bg-repeat animate-pulse-slow"></div>
-      {bubbles.map(b => (
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      {creatures.map(c => (
         <div
-          key={b.id}
-          className="absolute bottom-[-20px] rounded-full bg-white/20 border border-white/50 backdrop-blur-[1px]"
+          key={c.id}
+          className="absolute rounded-full mix-blend-screen opacity-80"
           style={{
-            left: b.left,
-            width: b.size,
-            height: b.size,
-            animation: `rise ${b.duration} linear infinite`,
-            animationDelay: b.delay,
+            left: c.left,
+            bottom: c.bottom,
+            width: c.size,
+            height: c.size,
+            backgroundColor: c.color,
+            boxShadow: `0 0 ${c.shadowSize}px ${c.size}px ${c.color}`,
+            animation: `float-glow ${c.duration} ease-in-out infinite alternate`,
+            animationDelay: c.delay,
           }}
         />
       ))}
@@ -39,13 +86,36 @@ const BubbleEffect = () => {
   );
 };
 
-// Hiệu ứng 2: Đàn cá bơi (làm trong suốt hơn)
-const FishEffect = () => {
-  const fishList = Array.from({ length: 7 }).map((_, i) => ({
+// 4. Bong bóng sủi bọt
+const BubbleEffect = () => {
+  const bubbles = Array.from({ length: 20 }).map((_, i) => ({
     id: i,
-    top: `${10 + Math.random() * 70}%`,
-    size: Math.random() * 30 + 25,
-    duration: `${18 + Math.random() * 12}s`,
+    left: `${Math.random() * 100}%`,
+    size: Math.random() * 10 + 6,
+    duration: `${6 + Math.random() * 8}s`,
+    delay: `${Math.random() * 5}s`,
+  }));
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-0">
+      {bubbles.map(b => (
+        <div
+          key={b.id}
+          className="absolute bottom-[-20px] rounded-full bg-white/30 border border-white/60 backdrop-blur-[1px]"
+          style={{ left: b.left, width: b.size, height: b.size, animation: `rise ${b.duration} linear infinite`, animationDelay: b.delay }}
+        />
+      ))}
+    </div>
+  );
+};
+
+// 5. Đàn cá bơi trong suốt
+const FishEffect = () => {
+  const fishList = Array.from({ length: 6 }).map((_, i) => ({
+    id: i,
+    top: `${15 + Math.random() * 60}%`,
+    size: Math.random() * 30 + 20,
+    duration: `${20 + Math.random() * 15}s`,
     delay: `${Math.random() * 10}s`,
     direction: Math.random() > 0.5 ? 'left-to-right' : 'right-to-left'
   }));
@@ -53,17 +123,7 @@ const FishEffect = () => {
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
       {fishList.map(f => (
-        <div
-          key={f.id}
-          className="absolute opacity-20 text-cyan-500"
-          style={{
-            top: f.top,
-            width: f.size,
-            height: f.size / 2,
-            animation: `${f.direction} ${f.duration} linear infinite`,
-            animationDelay: f.delay,
-          }}
-        >
+        <div key={f.id} className="absolute opacity-20 text-cyan-600" style={{ top: f.top, width: f.size, height: f.size / 2, animation: `${f.direction} ${f.duration} linear infinite`, animationDelay: f.delay }}>
           <svg viewBox="0 0 100 50" fill="currentColor" style={{ transform: f.direction === 'right-to-left' ? 'scaleX(-1)' : 'none' }}>
             <path d="M10,25 C30,10 70,10 90,25 C70,40 30,40 10,25 M90,25 L100,15 L95,25 L100,35 Z" />
             <circle cx="30" cy="22" r="3" fill="rgba(0,0,0,0.5)" />
@@ -74,45 +134,31 @@ const FishEffect = () => {
   );
 };
 
-// Hiệu ứng 3: Hào quang nước lấp lánh (sáng hơn)
+// Hào quang chuột
 const OceanCursorGlow = () => {
   const [pos, setPos] = useState({ x: -100, y: -100 });
-
   useEffect(() => {
-    const updatePosition = (e: MouseEvent) => {
-      setPos({ x: e.clientX, y: e.clientY });
-    };
+    const updatePosition = (e: MouseEvent) => setPos({ x: e.clientX, y: e.clientY });
     window.addEventListener('mousemove', updatePosition);
     return () => window.removeEventListener('mousemove', updatePosition);
   }, []);
-
   return (
-    <div 
-      className="pointer-events-none fixed z-[9999] transition-all duration-300 ease-out mix-blend-overlay hidden lg:block"
-      style={{ left: pos.x, top: pos.y, transform: 'translate(-50%, -50%)' }}
-    >
+    <div className="pointer-events-none fixed z-[9999] transition-all duration-300 ease-out mix-blend-overlay hidden lg:block" style={{ left: pos.x, top: pos.y, transform: 'translate(-50%, -50%)' }}>
       <div className="w-8 h-8 bg-white rounded-full blur-[4px] animate-ping opacity-60"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-cyan-200 rounded-full blur-3xl opacity-50"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-cyan-100 rounded-full blur-3xl opacity-60"></div>
     </div>
   );
 };
 
-// Hiệu ứng 4: Bảng đá đại dương đung đưa (Dạng Pha lê 3D)
+// Bảng đá đại dương
 const OceanPlaque: React.FC<{ text: string, position: 'left' | 'right' }> = ({ text, position }) => {
   const words = text.split(' ');
   return (
-    <div 
-      className={`fixed top-[15%] hidden xl:flex flex-col items-center z-20 animate-float ${position === 'left' ? 'left-8' : 'right-8'}`}
-      style={{ animationDelay: position === 'left' ? '0s' : '2s' }}
-    >
-      {/* Khối pha lê nổi khối */}
+    <div className={`fixed top-[15%] hidden xl:flex flex-col items-center z-20 animate-float ${position === 'left' ? 'left-8' : 'right-8'}`} style={{ animationDelay: position === 'left' ? '0s' : '2s' }}>
       <div className="bg-white/10 backdrop-blur-lg text-cyan-900 py-10 px-5 rounded-[2.5rem] border border-cyan-100/40 shadow-[0_15px_30px_rgba(34,211,238,0.2)] flex flex-col gap-5 items-center justify-center min-w-[75px]">
-        {/* Viền trong 3D */}
         <div className="absolute inset-1.5 border-2 border-cyan-500/10 rounded-[20px] pointer-events-none shadow-[inset_0_0_10px_rgba(255,255,255,0.4)]"></div>
         {words.map((word, i) => (
-          <span key={i} className="font-sans text-2xl lg:text-3xl font-black uppercase tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]">
-            {word}
-          </span>
+          <span key={i} className="font-sans text-2xl lg:text-3xl font-black uppercase tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]">{word}</span>
         ))}
       </div>
     </div>
@@ -130,11 +176,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const savedHistory = localStorage.getItem(STORAGE_KEY);
     if (savedHistory) {
-      try {
-        setHistory(JSON.parse(savedHistory));
-      } catch (e) {
-        console.error('Failed to parse history', e);
-      }
+      try { setHistory(JSON.parse(savedHistory)); } catch (e) { console.error('Failed to parse', e); }
     }
   }, []);
 
@@ -143,12 +185,7 @@ const App: React.FC = () => {
   }, [history]);
 
   const addToHistory = (item: Omit<HistoryItem, 'id' | 'timestamp'>) => {
-    const newItem: HistoryItem = {
-      ...item,
-      id: Math.random().toString(36).substr(2, 9),
-      timestamp: Date.now(),
-    };
-    setHistory(prev => [newItem, ...prev].slice(0, 50));
+    setHistory(prev => [{ ...item, id: Math.random().toString(36).substr(2, 9), timestamp: Date.now() }, ...prev].slice(0, 50));
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,9 +199,7 @@ const App: React.FC = () => {
       setState({ status: 'error', message: 'Chỉ chấp nhận file Excel (.xlsx, .xls).' });
     } else {
       setState({ status: 'idle', message: '' });
-      validFiles.forEach(f => {
-        addToHistory({ type: 'upload', filename: f.name, size: f.size, platform: activePlatform });
-      });
+      validFiles.forEach(f => addToHistory({ type: 'upload', filename: f.name, size: f.size, platform: activePlatform }));
     }
     setFiles(prev => [...prev, ...validFiles]);
     setProcessedFileUrl(null);
@@ -173,10 +208,7 @@ const App: React.FC = () => {
 
   const removeFile = (index: number) => {
     setFiles(prev => prev.filter((_, i) => i !== index));
-    if (files.length <= 1) {
-      setProcessedFileUrl(null);
-      setState({ status: 'idle', message: '' });
-    }
+    if (files.length <= 1) { setProcessedFileUrl(null); setState({ status: 'idle', message: '' }); }
   };
 
   const handleProcess = async () => {
@@ -187,36 +219,27 @@ const App: React.FC = () => {
       const url = URL.createObjectURL(blob);
       setProcessedFileUrl(url);
       setState({ status: 'success', message: `Xử lý ${activePlatform.toUpperCase()} xong!` });
-      addToHistory({ 
-        type: 'download', 
-        filename: `KET_QUA_${activePlatform.toUpperCase()}_${new Date().getTime()}.xlsx`, 
-        count: files.length,
-        platform: activePlatform
-      });
+      addToHistory({ type: 'download', filename: `KET_QUA_${activePlatform.toUpperCase()}_${new Date().getTime()}.xlsx`, count: files.length, platform: activePlatform });
     } catch (error: any) {
       setState({ status: 'error', message: error.message || 'Lỗi xử lý file.' });
     }
   };
 
-  const reset = () => {
-    setFiles([]);
-    setState({ status: 'idle', message: '' });
-    setProcessedFileUrl(null);
-  };
-
-  const clearHistory = () => {
-    if (confirm('Xóa sạch lịch sử đơn?')) setHistory([]);
-  };
+  const reset = () => { setFiles([]); setState({ status: 'idle', message: '' }); setProcessedFileUrl(null); };
+  const clearHistory = () => { if (confirm('Xóa sạch lịch sử đơn?')) setHistory([]); };
 
   return (
-    <Layout>
+    // XÓA ẢNH NỀN CŨ - Chỉ dùng CSS Gradient cho nước biển trong vắt
+    <Layout className="bg-gradient-to-b from-cyan-200 via-sky-100 to-cyan-400 min-h-screen relative overflow-hidden">
+      <GlowingCreatures />
+      <SeaBed />
       <BubbleEffect />
       <FishEffect />
       <OceanCursorGlow />
       <OceanPlaque text="Sóng dữ không ngã lòng" position="left" />
       <OceanPlaque text="Biển khơi lộc tràn trề" position="right" />
 
-      <div className="flex flex-col gap-10 relative z-10 text-cyan-950">
+      <div className="flex flex-col gap-10 relative z-10 text-cyan-950 pt-10">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-2 bg-white/40 backdrop-blur-sm text-cyan-900 px-6 py-1.5 rounded-full text-sm font-bold tracking-wide uppercase border border-white/60 shadow-md animate-bounce-slow">
             <span className="animate-pulse">🌊</span> PHIÊN BẢN CÓ ĐƠN CLEAR WATER <span className="animate-pulse">🌊</span>
@@ -226,13 +249,12 @@ const App: React.FC = () => {
           </h1>
         </div>
 
-        {/* Platform Tabs Section - ĐỔI MÀU & 3D */}
+        {/* Platform Tabs Section */}
         <div className="flex justify-center">
-          {/* Khối Tabs dạng Kính 3D sáng */}
           <div className="bg-white/10 backdrop-blur-md p-2.5 rounded-3xl border border-cyan-100/40 shadow-[0_20px_40px_rgba(34,211,238,0.2)] flex gap-2">
             <button 
               onClick={() => { setActivePlatform('shopee'); reset(); }}
-              className={`px-8 py-3.5 rounded-xl font-bold text-lg transition-all Triển khai duration-300 ${
+              className={`px-8 py-3.5 rounded-xl font-bold text-lg transition-all duration-300 ${
                 activePlatform === 'shopee' 
                   ? 'bg-gradient-to-r from-orange-400 to-orange-500 text-white border border-orange-300 shadow-[0_10px_20px_rgba(249,115,22,0.3)] scale-105' 
                   : 'bg-transparent text-cyan-900 border-transparent hover:bg-white/20 hover:text-cyan-950'
@@ -242,7 +264,7 @@ const App: React.FC = () => {
             </button>
             <button 
               onClick={() => { setActivePlatform('tiktok'); reset(); }}
-              className={`px-8 py-3.5 rounded-xl font-bold text-lg transition-all border Triển khai duration-300 ${
+              className={`px-8 py-3.5 rounded-xl font-bold text-lg transition-all duration-300 ${
                 activePlatform === 'tiktok' 
                   ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white border border-cyan-300 shadow-[0_10px_20px_rgba(34,211,238,0.3)] scale-105' 
                   : 'bg-transparent text-cyan-900 border-transparent hover:bg-white/20 hover:text-cyan-950'
@@ -253,10 +275,10 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start px-4 lg:px-10">
           <div className="lg:col-span-4 space-y-6 order-2 lg:order-1 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            {/* Nhật ký Pha lê nổi 3D */}
-            <div className="bg-white/10 backdrop-blur-md p-7 rounded-3xl border border-cyan-100/40 shadow-[0_15px_30px_rgba(34,211,238,0.2)] space-y-4 transition-transform hover:-translate-y-1 duration-300">
+            {/* Nhật ký */}
+            <div className="bg-white/10 backdrop-blur-md p-7 rounded-3xl border border-cyan-100/40 shadow-[0_15px_30px_rgba(34,211,238,0.2)] space-y-4 transition-transform hover:-translate-y-1 duration-300 relative">
               <div className="absolute inset-1.5 border border-cyan-200/10 rounded-[20px] pointer-events-none shadow-[inset_0_0_10px_rgba(255,255,255,0.4)]"></div>
               <div className="flex items-center justify-between border-b border-cyan-100/30 pb-3 relative z-10">
                 <h2 className="text-lg font-bold text-cyan-950 tracking-wide font-sans">NHẬT KÝ BIỂN KHƠI</h2>
@@ -272,9 +294,7 @@ const App: React.FC = () => {
                   history.map(item => (
                     <div key={item.id} className="flex items-start gap-3 p-3 rounded-xl bg-cyan-100/20 border border-cyan-500/10 hover:border-cyan-500/30 transition-all">
                       <div className={`mt-0.5 w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold border shadow-sm ${
-                        item.platform === 'shopee' 
-                          ? 'bg-orange-500/30 text-orange-950 border-orange-500/40' 
-                          : 'bg-cyan-500/30 text-cyan-950 border-cyan-500/40'
+                        item.platform === 'shopee' ? 'bg-orange-500/30 text-orange-950 border-orange-500/40' : 'bg-cyan-500/30 text-cyan-950 border-cyan-500/40'
                       }`}>
                         {item.platform === 'shopee' ? 'S' : 'T'}
                       </div>
@@ -293,7 +313,6 @@ const App: React.FC = () => {
           </div>
 
           <div className="lg:col-span-8 space-y-6 order-1 lg:order-2 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            {/* Khối Thả File Pha lê nổi 3D */}
             <div className="bg-white/10 backdrop-blur-md p-2 rounded-[2.5rem] border border-cyan-100/40 shadow-[0_20px_40px_rgba(34,211,238,0.2)] overflow-hidden relative">
               <div className="absolute inset-2 border-2 border-cyan-200/10 rounded-[35px] pointer-events-none shadow-[inset_0_0_15px_rgba(255,255,255,0.4)]"></div>
               <div className="p-8 relative z-10">
@@ -349,7 +368,7 @@ const App: React.FC = () => {
                             particleCount: 150,
                             spread: 80,
                             origin: { y: 0.6 },
-                            colors: ['#38bdf8', '#fb7185', '#22d3ee'] // Pháo giấy đổi sang màu pastel trong
+                            colors: ['#38bdf8', '#fb7185', '#22d3ee']
                           });
                         }
                         handleProcess();
@@ -410,20 +429,20 @@ const App: React.FC = () => {
         </div>
       </div>
       
-      {/* Khai báo CSS keyframes cho chủ đề Clear Water */}
+      {/* Khai báo CSS */}
       <style>{`
         .custom-scrollbar::-webkit-scrollbar{width:4px;}
         .custom-scrollbar::-webkit-scrollbar-track{background:transparent;}
         .custom-scrollbar::-webkit-scrollbar-thumb{background:#fb923c;border-radius:10px;}
         
-        /* Animations */
         .animate-spin-slow { animation: spin 15s linear infinite; }
         .animate-bounce-slow { animation: bounce 3s infinite; }
         .animate-float { animation: float 5s ease-in-out infinite; }
         .animate-slide-up { animation: slideUp 0.6s ease-out forwards; opacity: 0; transform: translateY(20px); }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         .animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-        .animate-pulse-slow { animation: pulseCaustics 8s ease-in-out infinite; }
+        .animate-sway { animation: sway 4s ease-in-out infinite alternate; transform-origin: bottom center; }
+        .animate-sway-slow { animation: sway 6s ease-in-out infinite alternate; transform-origin: bottom center; }
 
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes bounce { 
@@ -437,7 +456,6 @@ const App: React.FC = () => {
         @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        /* Bong bóng sủi từ đáy lên */
         @keyframes rise {
           0% { transform: translateY(0) scale(0.7); opacity: 0; }
           10% { opacity: 0.6; }
@@ -445,13 +463,16 @@ const App: React.FC = () => {
           100% { transform: translateY(-110vh) scale(1.1); opacity: 0; }
         }
 
-        /* Ánh nắng Caustics */
-        @keyframes pulseCaustics {
-          0%, 100% { opacity: 0.05; transform: scale(1); }
-          50% { opacity: 0.15; transform: scale(1.02); }
+        @keyframes float-glow {
+          0% { transform: translateY(0) scale(1); opacity: 0.4; }
+          100% { transform: translateY(-30px) scale(1.5); opacity: 0.9; }
         }
 
-        /* Đàn cá bơi ngang màn hình */
+        @keyframes sway {
+          0% { transform: rotate(-3deg); }
+          100% { transform: rotate(3deg); }
+        }
+
         @keyframes left-to-right {
           0% { transform: translateX(-20vw); opacity: 0; }
           10% { opacity: 0.2; }
