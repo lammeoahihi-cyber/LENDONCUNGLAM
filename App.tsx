@@ -22,7 +22,7 @@ const STORAGE_KEY = 'len_don_cung_lam_history_v2';
 // ⚠️ ĐIỀN THÔNG TIN API TRÊN SUPABASE CỦA BẠN VÀO ĐÂY
 // ==========================================
 const SUPABASE_URL = "https://pfwcfbsobsitfocjcfxg.supabase.co"; 
-const SUPABASE_ANON_KEY = "ĐIỀN_ANON_PUBLIC_KEY_CỦA_BẠN_VÀO_ĐÂY";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmd2NmaHNvYnNqdGZwY2pjZnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5OTI2MjcsImV4cCI6MjA5NjU2ODYyN30.aYskBWpE7ZxwoujAjEMfbUN1X1EQP1DK9QuhjW1zIyQ";
 
 interface NoticeItem {
   id: number;
