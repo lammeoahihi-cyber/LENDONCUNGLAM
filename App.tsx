@@ -20,7 +20,7 @@ const MAX_FILES = 5;
 const STORAGE_KEY = 'len_don_cung_lam_history_v2';
 
 // ==========================================
-// ĐỊA CHỈ VÀ MÃ KHÓA SUPABASE ĐƯỢC THIẾT LẬP TRÊN CÙNG MỘT DÒNG THẲNG TẮP
+// ĐỊA CHỈ VÀ MÃ KHÓA SUPABASE ĐƯỢC ĐỒNG BỘ CHUẨN TRÊN MỘT DÒNG DUY NHẤT
 // ==========================================
 const SUPABASE_URL = "https://pfwcfbsobsitfocjcfxg.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmd2NmaHNvYnNqdGZwY2pjZnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5OTI2MjcsImV4cCI6MjA5NjU2ODYyN30.aYskBWpE7ZxwoujAjEMfbUN1X1EQP1DK9QuhjW1zIyQ";
@@ -45,7 +45,7 @@ const DEFAULT_NOTICES: NoticeItem[] = [
   { id: 3, date: "01/06", title: "Nhập kho hàng hè mới", desc: "Kiểm đếm số lượng áo thun và váy hoa nhí vừa về." },
 ];
 
-// Hàm fetch tự chế tương tác Supabase không sử dụng npm package ngoài (Tránh lỗi build Vercel)
+// Bộ kết nối REST API Fetch độc lập cho Supabase không dùng npm ngoài
 const sFetchGet = async () => {
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/feedbacks?select=*&order=timestamp.desc`, {
@@ -239,7 +239,7 @@ const App: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Đọc danh sách sản phẩm mẫu cố định
+  // Đọc danh sách sản phẩm mẫu cố định từ file excel gốc của bạn
   useEffect(() => {
     const loadDefaultProducts = async () => {
       try {
@@ -250,7 +250,7 @@ const App: React.FC = () => {
         const workbook = XLSX.read(data, { type: 'array' });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
-        const jsonData: any[] = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
+        const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
         let foundProductNames: string[] = [];
         if (jsonData.length > 0) {
@@ -349,7 +349,7 @@ const App: React.FC = () => {
       setState({ status: 'success', message: `Gộp đơn ${activePlatform.toUpperCase()} thành công!` });
       setShowCelebrationBubbles(true);
       
-      // CẬP NHẬT TÊN TIẾNG VIỆT CHO DANH SÁCH NHẬT KÝ ĐẦU RA
+      // ĐỔI TÊN FILE ĐẦU RA TIẾNG VIỆT CHUẨN ĐÚNG YÊU CẦU CỦA BẠN
       addToHistory({ 
         type: 'download', filename: `Kết Quả_${activePlatform.toUpperCase()}_${new Date().getTime()}.xlsx`, 
         count: files.length, platform: activePlatform
@@ -401,7 +401,7 @@ const App: React.FC = () => {
                   }`}
                 >
                   <div className={`w-11 h-11 flex-shrink-0 rounded-xl flex flex-col items-center justify-center font-mono font-black text-xs border ${
-                    isOcean ? 'bg-cyan-950/80 border-cyan-500/40 text-cyan-300' : 'bg-gradient-to-br from-red-500 to-red-600 border-red-400 text-white'
+                    isOcean ? 'bg-cyan-950/80 border-cyan-500/40 text-cyan-300' : 'bg-gradient-to-br from-red-500 to-red-600 text-white'
                   }`}>
                     {notice.date}
                   </div>
@@ -416,7 +416,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* GIỮ NGUYÊN COMPONENT LAYOUT GỐC ĐỂ ĐẢM BẢO KHÔNG LỖI ĐƯỜNG DẪN HOẶC MẤT CHÂN TRANG FOOTER */}
+      {/* GIỮ NGUYÊN COMPONENT LAYOUT GỐC CỦA BẠN ĐỂ HIỂN THỊ CHÂN TRANG FOOTER */}
       <Layout theme={theme} toggleTheme={toggleTheme}>
         <div className="px-4 py-6 pt-10">
           <ClickBubbleBurst />
@@ -481,189 +481,4 @@ const App: React.FC = () => {
               </button>
 
               <div className={`inline-flex items-center gap-2 px-6 py-1.5 rounded-full text-sm font-bold tracking-wide uppercase border shadow-lg transition-all duration-500 ${isOcean ? 'bg-slate-900/60 text-cyan-200 border-cyan-500/40 shadow-cyan-950/40' : 'bg-gradient-to-r from-yellow-105 via-yellow-100 to-amber-100 text-yellow-805 border-yellow-355 shadow-yellow-200/50'}`}>
-                {isOcean ? ( <> <span className="text-cyan-400 animate-pulse">🫧</span> Phiên Bản ĐÁY BIỂN <span className="text-cyan-400 animate-pulse">🫧</span> </> ) : ( <> <span className="text-yellow-600 animate-pulse">✨</span> Phiên Bản CÓ ĐƠN <span className="text-yellow-600 animate-pulse">✨</span> </> )}
-              </div>
-              <h1 className={`text-5xl md:text-7xl font-black tracking-tight leading-none font-tet-title mt-4 text-transparent bg-clip-text bg-gradient-to-br animate-shimmer drop-shadow-lg transition-all duration-500 ${isOcean ? 'from-cyan-300 via-sky-100 to-teal-400' : 'from-yellow-500 via-yellow-300 to-amber-600'}`} style={{textShadow: isOcean ? '0 4px 20px rgba(6, 182, 212, 0.4)' : '0 4px 20px rgba(251, 191, 36, 0.4)'}}>LÊN ĐƠN THÔI</h1>
-            </div>
-
-            {/* Platform Tabs */}
-            <div className="flex justify-center">
-              <div className={`p-2 rounded-2xl flex gap-2 border transition-all duration-500 relative overflow-hidden ${isOcean ? 'bg-slate-900/60 backdrop-blur-md border-cyan-500/50 shadow-[0_0_25px_rgba(6,182,212,0.3)] shadow-[inset_0_2px_8px_rgba(6,182,212,0.1)]' : 'bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl border-2 border-yellow-300 shadow-inner'}`}>
-                {isOcean && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent" style={{ animation: 'scan-neon 3s linear infinite' }}></div>}
-                <button onClick={() => { setActivePlatform('shopee'); reset(); }} className={`px-8 py-3 rounded-xl font-bold text-lg transition-all border-2 duration-300 ${activePlatform === 'shopee' ? 'bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 text-white border-orange-400 shadow-lg shadow-orange-500/35 scale-105' : (isOcean ? 'bg-slate-950/60 text-cyan-200 border-transparent hover:bg-slate-900 hover:border-cyan-500/30 hover:text-cyan-100' : 'bg-white text-orange-850 border-transparent hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600')}`}>SHOPEE</button>
-                <button onClick={() => { setActivePlatform('tiktok'); reset(); }} className={`px-8 py-3 rounded-xl font-bold text-lg transition-all border-2 duration-300 ${activePlatform === 'tiktok' ? (isOcean ? 'bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 text-white border-cyan-455 shadow-lg shadow-cyan-500/35 scale-105' : 'bg-gradient-to-r from-slate-900 to-black text-white border-slate-700 shadow-lg shadow-slate-400/50 scale-105') : (isOcean ? 'bg-slate-950/60 text-cyan-200 border-transparent hover:bg-slate-900 hover:border-cyan-500/30 hover:text-cyan-100' : 'bg-white text-slate-800 border-transparent hover:bg-slate-50 hover:border-slate-200 hover:text-black')}`}>TIKTOK</button>
-              </div>
-            </div>
-
-            {/* BỐ CỤC ĐƠN HÀNG TRUNG TÂM */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
-              
-              {/* CỘT TRÁI (4 CỘT): HISTORY CARD */}
-              <div className="lg:col-span-4 space-y-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                <div className={`p-7 rounded-3xl border-2 transition-all duration-500 shadow-2xl hover:-translate-y-1 space-y-4 ${isOcean ? 'bg-slate-950/50 border-cyan-500/20 shadow-cyan-950/40 text-cyan-100' : 'bg-white border-yellow-200 shadow-yellow-100/50 text-amber-900'}`}>
-                  <div className={`flex items-center justify-between border-b pb-3 ${isOcean ? 'border-cyan-500/30' : 'border-yellow-200'}`}>
-                    <h2 className={`text-lg font-bold font-tet-title ${isOcean ? 'text-cyan-300' : 'text-yellow-805'}`}>Nhật ký</h2>
-                    {history.length > 0 && <button onClick={clearHistory} className={`text-xs font-black uppercase tracking-wider ${isOcean ? 'text-cyan-404 hover:text-cyan-200' : 'text-yellow-600 hover:text-red-500'}`}>Xóa</button>}
-                  </div>
-                  <div className="max-h-[300px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
-                    {history.length === 0 ? (
-                      <div className="text-center py-8"><span className="text-4xl opacity-30 animate-pulse">{isOcean ? '🫧' : '✨'}</span><p className={`text-xs mt-2 font-medium ${isOcean ? 'text-cyan-404' : 'text-yellow-600'}`}>Chưa có lịch sử</p></div>
-                    ) : (
-                      history.map(item => (
-                        <div key={item.id} className={`flex items-start gap-3 p-3 rounded-xl border hover:border-cyan-400/60 shadow-md transition-all ${isOcean ? 'bg-gradient-to-r from-slate-900/50 to-slate-800/40 border-cyan-500/20 text-cyan-100' : 'bg-gradient-to-r from-yellow-50 to-white border-yellow-150 text-amber-900'}`}>
-                          <div className={`mt-0.5 w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold border shadow-sm ${item.platform === 'shopee' ? 'bg-gradient-to-br from-orange-100 to-orange-250 text-orange-700 border-orange-300' : (isOcean ? 'bg-gradient-to-br from-cyan-900 to-cyan-750 text-white border-cyan-600' : 'bg-gradient-to-br from-slate-700 to-slate-900 text-white border-slate-600')}`}>{item.platform === 'shopee' ? 'S' : 'T'}</div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-bold truncate text-sm opacity-90">{item.filename}</p>
-                            <div className="flex justify-between items-center mt-1 text-xs font-medium opacity-60"><span>{item.type === 'upload' ? 'Tải lên' : 'Kết quả'}</span><span>{new Date(item.timestamp).toLocaleTimeString('vi-VN')}</span></div>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* CỘT PHẢI (8 CỘT): KHU VỰC THẢ FILE & "HÔM NAY BÁN GÌ?" */}
-              <div className="lg:col-span-8 space-y-6 order-1 lg:order-2 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                <div className={`p-2 rounded-[2.5rem] border-4 shadow-2xl overflow-hidden relative transition-all duration-500 ${isOcean ? 'bg-slate-950/50 border-cyan-500/30 shadow-cyan-950/30' : 'bg-white border-yellow-300 shadow-yellow-100/50'}`}>
-                  <div className="p-8 relative z-10">
-                    {files.length < MAX_FILES && !processedFileUrl && (
-                      <div onClick={() => fileInputRef.current?.click()} className={`border-2 border-dashed rounded-3xl p-16 flex flex-col items-center justify-center cursor-pointer transition-all mb-8 group relative overflow-hidden ${activePlatform === 'shopee' ? 'border-orange-500/40 bg-orange-950/15 hover:bg-orange-950/25 hover:border-orange-400' : (isOcean ? 'border-cyan-500/40 bg-cyan-950/15 hover:bg-cyan-950/25 hover:border-cyan-400' : 'border-yellow-405 bg-yellow-50/30 hover:bg-yellow-50/60 hover:border-yellow-500')}`}>
-                        <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-5 transition-transform group-hover:scale-110 group-hover:rotate-12 duration-300 shadow-xl ${activePlatform === 'shopee' ? 'bg-gradient-to-br from-slate-900/80 to-orange-950/50 text-orange-400 shadow-orange-900/40' : (isOcean ? 'bg-gradient-to-br from-slate-900/80 to-cyan-950/50 text-cyan-400 shadow-cyan-900/40' : 'bg-gradient-to-br from-yellow-104 via-yellow-200 to-amber-305 text-yellow-600 shadow-yellow-200/40')}`}>
-                           {activePlatform === 'shopee' ? <BubbleSVG className="w-12 h-12" /> : <svg className="w-10 h-10 animate-bounce-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>}
-                        </div>
-                        <p className={`text-2xl font-black text-center font-tet-title group-hover:scale-105 transition-transform ${isOcean ? 'text-cyan-100' : 'text-amber-955'}`}>Thả file {activePlatform.toUpperCase()} vào đây</p>
-                        <p className="mt-2 font-medium opacity-60">hoặc nhấn để chọn file</p>
-                        <input type="file" ref={fileInputRef} className="hidden" accept=".xlsx,.xls" multiple onChange={handleFileChange} />
-                      </div>
-                    )}
-
-                    {/* LIST FILE */}
-                    {files.length > 0 && (
-                      <div className="space-y-4 mb-8">
-                        <div className="flex items-center justify-between border-b pb-2 border-cyan-500/30">
-                          <h3 className="text-xs font-black uppercase tracking-widest text-cyan-300">Danh sách ({files.length})</h3>
-                          {!processedFileUrl && <button onClick={reset} className="text-xs text-rose-450 font-bold hover:bg-rose-950/30 px-3 py-1 rounded-full transition-colors">Hủy bỏ</button>}
-                        </div>
-                        {files.map((f, index) => (
-                          <div key={index} className={`flex items-center justify-between p-4 rounded-xl border group transition-colors animate-fade-in ${isOcean ? 'bg-cyan-950/40 border-cyan-500/20 hover:border-cyan-400' : 'bg-yellow-50/40 border-yellow-250 hover:border-amber-400'}`}>
-                            <div className="flex items-center gap-3">
-                               <div className="p-2 rounded-lg shadow-sm border bg-slate-900 text-cyan-400 border-cyan-500/20"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div>
-                               <span className="text-sm font-bold truncate max-w-[200px]">{f.name}</span>
-                            </div>
-                            {!processedFileUrl && <button onClick={() => removeFile(index)} className="text-rose-404 hover:text-rose-300 p-2"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Ô QUAY SỐ SẢN PHẨM NGẪU NHIÊN CÓ SẴN (products.xlsx) */}
-                    {productList.length > 0 && !processedFileUrl && (
-                      <div className={`p-5 mb-8 rounded-2xl border-2 transition-all duration-500 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg ${isOcean ? 'bg-slate-900/60 border-cyan-500/20 text-cyan-100' : 'bg-amber-50/60 border-yellow-300 text-amber-900'}`}>
-                        <div className="flex-1 text-center sm:text-left min-w-0 w-full">
-                          <p className="text-xs font-mono font-bold uppercase tracking-widest opacity-70">🎲 Gợi ý mặt hàng hôm nay ({productList.length}):</p>
-                          <div className={`text-sm font-bold mt-1.5 truncate p-3 rounded-xl border border-dashed min-h-[48px] flex items-center justify-center sm:justify-start ${randomProduct ? 'bg-cyan-950/40 border-cyan-500/30 text-white' : 'opacity-40 italic text-xs'}`}>{randomProduct || "Đang chờ quay số..."}</div>
-                        </div>
-                        <button onClick={handlePickRandomProduct} className="px-5 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-400 text-white rounded-xl font-bold text-xs uppercase flex-shrink-0 tracking-wider">Hôm nay bán gì?</button>
-                      </div>
-                    )}
-
-                    {/* CONTROLS BUTTONS */}
-                    <div className="flex flex-col gap-4">
-                      {state.status === 'idle' && files.length > 0 && (
-                        <button onClick={handleProcess} className="w-full py-5 rounded-2xl font-bold text-xl transition-all shadow-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 text-white border border-cyan-400">XỬ LÝ GỘP ĐƠN NGAY</button>
-                      )}
-                      {state.status === 'processing' && <div className="text-center py-12 text-cyan-400 animate-pulse font-bold tracking-widest uppercase text-sm">{state.message}</div>}
-                      {state.status === 'success' && processedFileUrl && (
-                        <div className="space-y-5 animate-slide-up">
-                          <div className="p-6 bg-emerald-950/30 border border-emerald-500/40 rounded-2xl text-center font-bold text-emerald-400">Gộp file xuất sắc thành công tốt đẹp!</div>
-                          <a href={processedFileUrl} download={`Kết Quả_${activePlatform.toUpperCase()}_${Date.now()}.xlsx`} className="flex items-center justify-center w-full py-6 rounded-2xl font-black text-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-xl">TẢI FILE KẾT QUẢ</a>
-                          <button onClick={reset} className="w-full text-center text-xs opacity-60 font-bold py-2">Làm lượt mới</button>
-                        </div>
-                      )}
-                      {state.status === 'error' && <div className="p-6 bg-rose-950/40 border border-rose-500/40 text-rose-200 rounded-2xl text-center text-sm">{state.message}</div>}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ====================================================================
-                MỤC MỚI NÂNG CẤP: KHU VỰC GÓP Ý NẰM Ở DƯỚI CÙNG TRANG WEB ĐÚNG YÊU CẦU
-                ==================================================================== */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full border-t border-cyan-500/10 pt-8 mt-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-              
-              {/* KHUNG NHẬP GÓP Ý (BÊN TRÁI) */}
-              <div className="lg:col-span-5">
-                <form onSubmit={handleSendFeedback} className={`p-6 rounded-3xl border-2 shadow-xl space-y-4 ${isOcean ? 'bg-slate-950/40 border-cyan-500/30 text-cyan-100 shadow-cyan-950/20' : 'bg-white border-yellow-300 shadow-yellow-100/40 text-amber-900'}`}>
-                  <h3 className="text-base font-black uppercase text-cyan-300 tracking-wider">Gửi góp ý của bạn</h3>
-                  <div className="space-y-3">
-                    {/* TÊN BÊN TRÊN */}
-                    <div>
-                      <label className="text-[11px] font-bold block mb-1 uppercase tracking-wider opacity-70">Tên của bạn:</label>
-                      <input 
-                        type="text" 
-                        required 
-                        value={fbName} 
-                        onChange={(e) => setFbName(e.target.value)} 
-                        placeholder="Nhập tên..." 
-                        className="w-full px-4 py-2.5 rounded-xl border border-cyan-500/20 bg-slate-900/80 outline-none text-sm font-bold text-white" 
-                      />
-                    </div>
-                    {/* GÓP Ý BÊN DƯỚI */}
-                    <div>
-                      <label className="text-[11px] font-bold block mb-1 uppercase tracking-wider opacity-70">Nội dung góp ý:</label>
-                      <textarea 
-                        required 
-                        rows={3} 
-                        value={fbContent} 
-                        onChange={(e) => setFbContent(e.target.value)} 
-                        placeholder="Góp ý tính năng cải tiến..." 
-                        className="w-full px-4 py-3 rounded-xl border border-cyan-500/20 bg-slate-900/80 outline-none text-sm resize-none text-white" 
-                      />
-                    </div>
-                    <button type="submit" className="w-full py-3 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-xl font-bold text-xs tracking-widest uppercase">Gửi ý kiến ngay</button>
-                  </div>
-                </form>
-              </div>
-
-              {/* BẢNG HIỂN THỊ CÁC BÀI GÓP Ý (BÊN PHẢI) */}
-              <div className="lg:col-span-7">
-                <div className={`p-6 rounded-3xl border-2 shadow-xl flex flex-col h-[302px] ${isOcean ? 'bg-slate-950/40 border-cyan-500/20' : 'bg-white border-yellow-200'}`}>
-                  <h3 className="text-base font-black uppercase text-cyan-300 tracking-wider border-b border-cyan-500/20 pb-3 mb-3">Hòm thư góp ý công khai ({feedbacks.length})</h3>
-                  <div className="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar">
-                    {feedbacks.length === 0 ? (
-                      <p className="text-center py-12 opacity-40 italic text-sm">Chưa có bài góp ý nào.</p>
-                    ) : (
-                      feedbacks.map(fb => (
-                        <div key={fb.id} className={`p-3.5 rounded-2xl border text-xs ${isOcean ? 'bg-slate-900/40 border-cyan-500/10' : 'bg-gradient-to-r from-amber-50/30 to-white border-yellow-100 text-amber-955'}`}>
-                          <div className="flex justify-between border-b border-dashed border-cyan-500/20 pb-1 mb-2 opacity-80 font-bold">
-                            <span className="text-cyan-300">👤 {fb.name}</span>
-                            <span className="opacity-50">{new Date(fb.timestamp).toLocaleDateString('vi-VN')}</span>
-                          </div>
-                          <p className="leading-relaxed whitespace-pre-wrap text-left font-medium">{fb.content}</p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </Layout>
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Zeyada&family=Ruthie&display=swap');
-        
-        /* ĐƯA 2 CÂU ĐỐI VỀ PHÔNG CHỮ THƯ PHÁP NGHỆ THUẬT */
-        [class*="Couplet"], .fixed.w-12.text-center {
-          font-family: 'Zeyada', 'Ruthie', cursive !important;
-          font-size: 26px !important;
-          line-height: 1.2 !important;
-          letter-spacing: 2px !important;
-        }
-
-        /* Ẩn dải menu thanh đen trên cùng theo yêu cầu trước */
-        nav, header,
+                {isOcean ? ( <> <span className="text-cyan-400 animate-pulse">🫧</span> Phiên Bản ĐÁY BIỂN <span className="text-cyan-400 animate-pulse">🫧</span> </> ) : ( <> <span className="text-yellow-600 animate-pulse">✨</span> Phiên Bản CÓ ĐƠN <span className="text-yellow-600 animate-pulse">✨
