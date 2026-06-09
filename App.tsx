@@ -19,7 +19,7 @@ const MAX_FILES = 5;
 const STORAGE_KEY = 'len_don_cung_lam_history_v2';
 
 // ==========================================
-// ⚠️ ĐIỀN THÔNG TIN API TRÊN SUPABASE CỦA BẠN VÀO ĐÂY
+// ĐÃ SỬA LỖI CÚ PHÁP: ĐƯA ANON KEY VỀ CÙNG MỘT DÒNG THẲNG TẮP KHÔNG XUỐNG DÒNG
 // ==========================================
 const SUPABASE_URL = "https://pfwcfbsobsitfocjcfxg.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmd2NmaHNvYnNqdGZwY2pjZnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5OTI2MjcsImV4cCI6MjA5NjU2ODYyN30.aYskBWpE7ZxwoujAjEMfbUN1X1EQP1DK9QuhjW1zIyQ";
@@ -85,9 +85,7 @@ const BioluminescentFlowersTet = () => {
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
       {flowers.map(f => (
         <div key={f.id} className="absolute -top-10 opacity-90" style={{ left: f.left, width: f.size, height: f.size, animation: `fall ${f.animationDuration} linear infinite, pulseBreath ${f.pulseDuration} ease-in-out infinite alternate`, animationDelay: `${f.animationDelay}, 0s` }}>
-          <svg className="w-full h-full animate-spin-slow" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 4px 8px rgba(234,179,8,0.4))' }}>
-            <path d="M50,15 C60,0 80,15 70,35 C85,25 100,45 80,60 C90,80 65,95 50,75 C35,95 10,80 20,60 C0,45 15,25 30,35 C20,15 40,0 50,15 Z" fill={f.color}/><circle cx="50" cy="48" r="12" fill={f.centerColor}/>
-          </svg>
+          <svg className="w-full h-full animate-spin-slow" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50,15 C60,0 80,15 70,35 C85,25 100,45 80,60 C90,80 65,95 50,75 C35,95 10,80 20,60 C0,45 15,25 30,35 C20,15 40,0 50,15 Z" fill={f.color}/><circle cx="50" cy="48" r="12" fill={f.centerColor}/></svg>
         </div>
       ))}
     </div>
@@ -372,7 +370,6 @@ const App: React.FC = () => {
           <ClickBubbleBurst /><SuccessBubbleBlast trigger={showCelebrationBubbles} />
           {isOcean ? ( <> <RisingBubbles /> <InteractiveSwimmingFish /> <BioluminescenceSpores /> <WaterDistortionOverlay /> </> ) : ( <BioluminescentFlowersTet /> )}
           
-          {/* CÂU ĐỐI ĐÃ ĐƯỢC ÉP FONT THƯ PHÁP TỰ ĐỘNG QUA CLASS font-calligraphy */}
           <Couplet text="Đơn thưa, lòng không nản" position="left" theme={theme} />
           <Couplet text="Chí vững, lộc ắt về" position="right" theme={theme} />
           
@@ -536,7 +533,7 @@ const App: React.FC = () => {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Zeyada&family=Ruthie&display=swap');
 
-        /* ÉP FONT CHỮ THƯ PHÁP NGHỆ THUẬT VÀO THANH CÂU ĐỐI */
+        /* ÉP FONT CHỮ THƯ PHÁP NGHỆ THUẬT VÀO THANH CÂU ĐỐI GỐC CỦA BẠN */
         [class*="Couplet"], .fixed.w-12.text-center {
           font-family: 'Zeyada', 'Ruthie', cursive !important;
           font-size: 26px !important;
