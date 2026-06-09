@@ -35,7 +35,7 @@ const DEFAULT_NOTICES: NoticeItem[] = [
 ];
 
 // ==========================================
-// CÁC COMPONENT SVG VÀ TRANG TRÍ ĐỒ HỌA NỘI BỘ (KHÔNG IMPORT NGOÀI)
+// COMPONENT ĐỒ HỌA SVG NỘI BỘ 
 // ==========================================
 const Sparkle = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z" /></svg>
@@ -192,7 +192,7 @@ const InteractiveSwimmingFish = () => {
   );
 };
 
-// Bộ kết nối REST API Fetch độc lập cho Supabase không dùng npm ngoài
+// ĐÃ THÊM TRY...CATCH CHỐNG SẬP MÀN HÌNH TRẮNG KHI CHƯA ĐÁNH THỨC DATABASE
 const sFetchGet = async () => {
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/feedbacks?select=*&order=timestamp.desc`, {
@@ -201,7 +201,10 @@ const sFetchGet = async () => {
     });
     if (!res.ok) return [];
     return await res.json();
-  } catch (e) { return []; }
+  } catch (e) { 
+    console.error("Supabase đang ngủ đông hoặc lỗi kết nối mạng!");
+    return []; 
+  }
 };
 
 const sFetchPost = async (payload: any) => {
@@ -399,9 +402,7 @@ const App: React.FC = () => {
   return (
     <div className="w-full relative">
       
-      {/* ====================================================================
-          BẢNG THÔNG BÁO QUAN TRỌNG: TUYỆT ĐỐI KHÍT VIỀN TRÊN, LĂN CHUỘT LÀ CUỐN MẤT
-          ==================================================================== */}
+      {/* BẢNG THÔNG BÁO QUAN TRỌNG ABSOLUTE SÁT ĐỈNH */}
       {notices.length > 0 && (
         <div className="absolute top-0 right-0 z-[999] hidden md:block animate-slide-up">
           <div className={`pb-5 px-5 pt-0 rounded-bl-3xl border-b-2 border-l-2 border-t-0 transition-all duration-500 shadow-2xl w-[320px] lg:w-[355px] space-y-4 ${
@@ -428,7 +429,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* GIỮ NGUYÊN COMPONENT LAYOUT GỐC ĐỂ HIỂN THỊ CHÂN TRANG FOOTER */}
       <Layout theme={theme} toggleTheme={toggleTheme}>
         <div className="px-4 py-6 pt-10">
           <ClickBubbleBurst /><SuccessBubbleBlast trigger={showCelebrationBubbles} />
@@ -467,29 +467,26 @@ const App: React.FC = () => {
 
             {/* Platform Tabs */}
             <div className="flex justify-center">
-              <div className={`p-2 rounded-2xl flex gap-2 border transition-all duration-500 relative overflow-hidden ${isOcean ? 'bg-slate-900/60 backdrop-blur-md border-cyan-500/50 shadow-[0_0_25px_rgba(6,182,212,0.3)] shadow-[inset_0_2px_8px_rgba(6,182,212,0.1)]' : 'bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl border-2 border-yellow-300 shadow-inner'}`}>
-                {isOcean && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent" style={{ animation: 'scan-neon 3s linear infinite' }}></div>}
-                <button onClick={() => { setActivePlatform('shopee'); reset(); }} className={`px-8 py-3 rounded-xl font-bold text-lg transition-all border-2 duration-300 ${activePlatform === 'shopee' ? 'bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 text-white border-orange-400 shadow-lg shadow-orange-500/35 scale-105' : (isOcean ? 'bg-slate-950/60 text-cyan-200 border-transparent hover:border-cyan-500/30 hover:text-cyan-100' : 'bg-white text-orange-850 border-transparent hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600')}`}>SHOPEE</button>
-                <button onClick={() => { setActivePlatform('tiktok'); reset(); }} className={`px-8 py-3 rounded-xl font-bold text-lg transition-all border-2 duration-300 ${activePlatform === 'tiktok' ? (isOcean ? 'bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 text-white border-cyan-455 shadow-lg shadow-cyan-500/35 scale-105' : 'bg-gradient-to-r from-slate-900 to-black text-white border-slate-700 shadow-lg shadow-slate-400/50 scale-105') : (isOcean ? 'bg-slate-950/60 text-cyan-200 border-transparent hover:bg-slate-900 hover:border-cyan-500/30 hover:text-cyan-100' : 'bg-white text-slate-800 border-transparent hover:bg-slate-50 hover:border-slate-200 hover:text-black')}`}>TIKTOK</button>
+              <div className={`p-2 rounded-2xl flex gap-2 border transition-all duration-500 relative overflow-hidden ${isOcean ? 'bg-slate-900/60 backdrop-blur-md border-cyan-500/50 shadow-[0_0_25px_rgba(6,182,212,0.3)]' : 'bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl border-2 border-yellow-300'}`}>
+                <button onClick={() => { setActivePlatform('shopee'); reset(); }} className={`px-8 py-3 rounded-xl font-bold text-lg transition-all border-2 duration-300 ${activePlatform === 'shopee' ? 'bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 text-white border-orange-400 shadow-lg scale-105' : (isOcean ? 'bg-slate-950/60 text-cyan-200 border-transparent hover:border-cyan-500/30' : 'bg-white text-orange-850 border-transparent')}`}>SHOPEE</button>
+                <button onClick={() => { setActivePlatform('tiktok'); reset(); }} className={`px-8 py-3 rounded-xl font-bold text-lg transition-all border-2 duration-300 ${activePlatform === 'tiktok' ? (isOcean ? 'bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 text-white border-cyan-455 shadow-lg scale-105' : 'bg-gradient-to-r from-slate-900 to-black text-white border-slate-700 shadow-lg scale-105') : (isOcean ? 'bg-slate-950/60 text-cyan-200 border-transparent hover:border-cyan-500/30' : 'bg-white text-slate-800 border-transparent')}`}>TIKTOK</button>
               </div>
             </div>
 
-            {/* BỐ CỤC ĐƠN HÀNG TRUNG TÂM */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
-              {/* CỘT TRÁI (4 CỘT): HISTORY CARD */}
+              {/* NHẬT KÝ */}
               <div className="lg:col-span-4 space-y-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                <div className={`p-7 rounded-3xl border-2 transition-all duration-500 shadow-2xl hover:-translate-y-1 space-y-4 ${isOcean ? 'bg-slate-950/50 border-cyan-500/20 shadow-cyan-950/40 text-cyan-100' : 'bg-white border-yellow-200 shadow-yellow-100/50 text-amber-900'}`}>
+                <div className={`p-7 rounded-3xl border-2 transition-all duration-500 shadow-2xl hover:-translate-y-1 space-y-4 ${isOcean ? 'bg-slate-950/50 border-cyan-500/20 shadow-cyan-950/40 text-cyan-100' : 'bg-white border-yellow-200'}`}>
                   <div className={`flex items-center justify-between border-b pb-3 ${isOcean ? 'border-cyan-500/30' : 'border-yellow-200'}`}>
-                    <h2 className={`text-lg font-bold font-tet-title ${isOcean ? 'text-cyan-300' : 'text-yellow-805'}`}>Nhật ký</h2>
-                    {history.length > 0 && <button onClick={clearHistory} className={`text-xs font-black uppercase tracking-wider ${isOcean ? 'text-cyan-404 hover:text-cyan-200' : 'text-yellow-600 hover:text-red-500'}`}>Xóa</button>}
+                    <h2 className="text-lg font-bold font-tet-title">Nhật ký</h2>
+                    {history.length > 0 && <button onClick={clearHistory} className="text-xs font-black uppercase tracking-wider text-cyan-404">Xóa</button>}
                   </div>
                   <div className="max-h-[300px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
                     {history.length === 0 ? (
-                      <div className="text-center py-8"><span className="text-4xl opacity-30 animate-pulse">{isOcean ? '🫧' : '✨'}</span><p className={`text-xs mt-2 font-medium ${isOcean ? 'text-cyan-404' : 'text-yellow-600'}`}>Chưa có lịch sử</p></div>
+                      <div className="text-center py-8"><span className="text-4xl opacity-30 animate-pulse">{isOcean ? '🫧' : '✨'}</span><p className="text-xs mt-2 font-medium opacity-50">Chưa có lịch sử</p></div>
                     ) : (
                       history.map(item => (
-                        <div key={item.id} className={`flex items-start gap-3 p-3 rounded-xl border hover:border-cyan-400/60 shadow-md transition-all ${isOcean ? 'bg-gradient-to-r from-slate-900/50 to-slate-800/40 border-cyan-500/20 text-cyan-100' : 'bg-gradient-to-r from-yellow-50 to-white border-yellow-150 text-amber-900'}`}>
-                          <div className={`mt-0.5 w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold border shadow-sm ${item.platform === 'shopee' ? 'bg-gradient-to-br from-orange-100 to-orange-250 text-orange-700 border-orange-300' : (isOcean ? 'bg-gradient-to-br from-cyan-900 to-cyan-750 text-white border-cyan-600' : 'bg-gradient-to-br from-slate-700 to-slate-900 text-white border-slate-600')}`}>{item.platform === 'shopee' ? 'S' : 'T'}</div>
+                        <div key={item.id} className={`flex items-start gap-3 p-3 rounded-xl border shadow-md transition-all ${isOcean ? 'bg-gradient-to-r from-slate-900/50 to-slate-800/40 border-cyan-500/20 text-cyan-100' : 'bg-gradient-to-r from-yellow-50 to-white border-yellow-150'}`}>
                           <div className="flex-1 min-w-0">
                             <p className="font-bold truncate text-sm opacity-90">{item.filename}</p>
                             <div className="flex justify-between items-center mt-1 text-xs font-medium opacity-60"><span>{item.type === 'upload' ? 'Tải lên' : 'Kết quả'}</span><span>{new Date(item.timestamp).toLocaleTimeString('vi-VN')}</span></div>
@@ -501,15 +498,13 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              {/* CỘT PHẢI (8 CỘT): KHU VỰC THẢ FILE & "HÔM NAY BÁN GÌ?" */}
+              {/* THẢ FILE */}
               <div className="lg:col-span-8 space-y-6 order-1 lg:order-2 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                <div className={`p-2 rounded-[2.5rem] border-4 shadow-2xl overflow-hidden relative transition-all duration-500 ${isOcean ? 'bg-slate-950/50 border-cyan-500/30 shadow-cyan-950/30' : 'bg-white border-yellow-300 shadow-yellow-100/50'}`}>
+                <div className={`p-2 rounded-[2.5rem] border-4 shadow-2xl overflow-hidden relative transition-all duration-500 ${isOcean ? 'bg-slate-950/50 border-cyan-500/30' : 'bg-white border-yellow-300'}`}>
                   <div className="p-8 relative z-10">
                     {files.length < MAX_FILES && !processedFileUrl && (
-                      <div onClick={() => fileInputRef.current?.click()} className={`border-2 border-dashed rounded-3xl p-16 flex flex-col items-center justify-center cursor-pointer transition-all mb-8 group relative overflow-hidden ${activePlatform === 'shopee' ? 'border-orange-500/40 bg-orange-950/15 hover:bg-orange-950/25 hover:border-orange-400' : (isOcean ? 'border-cyan-500/40 bg-cyan-950/15 hover:bg-cyan-950/25 hover:border-cyan-400' : 'border-yellow-405 bg-yellow-50/30 hover:bg-yellow-50/60 hover:border-yellow-500')}`}>
-                        <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-5 transition-transform group-hover:scale-110 group-hover:rotate-12 duration-300 shadow-xl ${activePlatform === 'shopee' ? 'bg-gradient-to-br from-slate-900/80 to-orange-950/50 text-orange-400 shadow-orange-900/40' : (isOcean ? 'bg-gradient-to-br from-slate-900/80 to-cyan-950/50 text-cyan-400 shadow-cyan-900/40' : 'bg-gradient-to-br from-yellow-104 via-yellow-200 to-amber-305 text-yellow-600 shadow-yellow-200/40')}`}>
-                           {activePlatform === 'shopee' ? <BubbleSVG className="w-12 h-12" /> : <svg className="w-10 h-10 animate-bounce-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>}
-                        </div>
+                      <div onClick={() => fileInputRef.current?.click()} className={`border-2 border-dashed rounded-3xl p-16 flex flex-col items-center justify-center cursor-pointer transition-all mb-8 group relative overflow-hidden ${isOcean ? 'border-cyan-500/40 bg-cyan-950/15 hover:bg-cyan-950/25' : 'border-yellow-405 bg-yellow-50/30 hover:bg-yellow-50/60'}`}>
+                        <div className="w-24 h-24 rounded-full flex items-center justify-center mb-5 transition-transform group-hover:scale-110 shadow-xl bg-slate-900/80 text-cyan-400"><BubbleSVG className="w-12 h-12" /></div>
                         <p className={`text-2xl font-black text-center font-tet-title group-hover:scale-105 transition-transform ${isOcean ? 'text-cyan-100' : 'text-amber-955'}`}>Thả file {activePlatform.toUpperCase()} vào đây</p>
                         <p className="mt-2 font-medium opacity-60">hoặc nhấn để chọn file</p>
                         <input type="file" ref={fileInputRef} className="hidden" accept=".xlsx,.xls" multiple onChange={handleFileChange} />
@@ -521,32 +516,27 @@ const App: React.FC = () => {
                       <div className="space-y-4 mb-8">
                         <div className="flex items-center justify-between border-b pb-2 border-cyan-500/30">
                           <h3 className="text-xs font-black uppercase tracking-widest text-cyan-300">Danh sách ({files.length})</h3>
-                          {!processedFileUrl && <button onClick={reset} className="text-xs text-rose-450 font-bold hover:bg-rose-950/30 px-3 py-1 rounded-full transition-colors">Hủy bỏ</button>}
+                          {!processedFileUrl && <button onClick={reset} className="text-xs text-rose-450 font-bold">Hủy bỏ</button>}
                         </div>
                         {files.map((f, index) => (
-                          <div key={index} className={`flex items-center justify-between p-4 rounded-xl border group transition-colors animate-fade-in ${isOcean ? 'bg-cyan-950/40 border-cyan-500/20 hover:border-cyan-400' : 'bg-yellow-50/40 border-yellow-250 hover:border-amber-400'}`}>
-                            <div className="flex items-center gap-3">
-                               <div className="p-2 rounded-lg shadow-sm border bg-slate-900 text-cyan-400 border-cyan-500/20"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div>
-                               <span className="text-sm font-bold truncate max-w-[200px]">{f.name}</span>
-                            </div>
-                            {!processedFileUrl && <button onClick={() => removeFile(index)} className="text-rose-404 hover:text-rose-300 p-2"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>}
+                          <div key={index} className={`flex items-center justify-between p-4 rounded-xl border group transition-colors animate-fade-in ${isOcean ? 'bg-cyan-950/40 border-cyan-500/20' : 'bg-yellow-50/40 border-yellow-250'}`}>
+                            <span className="text-sm font-bold truncate max-w-[200px]">{f.name}</span>
+                            {!processedFileUrl && <button onClick={() => removeFile(index)} className="text-rose-404 px-2 font-bold">Xóa</button>}
                           </div>
                         ))}
                       </div>
                     )}
 
-                    {/* Ô QUAY SỐ SẢN PHẨM NGẪU NHIÊN CÓ SẴN (products.xlsx) */}
                     {productList.length > 0 && !processedFileUrl && (
-                      <div className={`p-5 mb-8 rounded-2xl border-2 transition-all duration-500 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg ${isOcean ? 'bg-slate-900/60 border-cyan-500/20 text-cyan-100' : 'bg-amber-50/60 border-yellow-300 text-amber-900'}`}>
+                      <div className={`p-5 mb-8 rounded-2xl border-2 transition-all duration-500 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg ${isOcean ? 'bg-slate-900/60 border-cyan-500/20' : 'bg-amber-50/60 border-yellow-300'}`}>
                         <div className="flex-1 text-center sm:text-left min-w-0 w-full">
                           <p className="text-xs font-mono font-bold uppercase tracking-widest opacity-70">🎲 Gợi ý mặt hàng hôm nay ({productList.length}):</p>
                           <div className={`text-sm font-bold mt-1.5 truncate p-3 rounded-xl border border-dashed min-h-[48px] flex items-center justify-center sm:justify-start ${randomProduct ? 'bg-cyan-950/40 border-cyan-500/30 text-white' : 'opacity-40 italic text-xs'}`}>{randomProduct || "Đang chờ quay số..."}</div>
                         </div>
-                        <button onClick={handlePickRandomProduct} className="px-5 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-400 text-white rounded-xl font-bold text-xs uppercase flex-shrink-0 tracking-wider">Hôm nay bán gì?</button>
+                        <button onClick={handlePickRandomProduct} className="px-5 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-xl font-bold text-xs uppercase flex-shrink-0 tracking-wider">Hôm nay bán gì?</button>
                       </div>
                     )}
 
-                    {/* CONTROLS BUTTONS */}
                     <div className="flex flex-col gap-4">
                       {state.status === 'idle' && files.length > 0 && (
                         <button onClick={handleProcess} className="w-full py-5 rounded-2xl font-bold text-xl transition-all shadow-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 text-white border border-cyan-400">XỬ LÝ GỘP ĐƠN NGAY</button>
@@ -566,7 +556,7 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* KHU VỰC GÓP Ý DƯỚI CÙNG TƯƠNG TÁC ONLINE QUA SUPABASE FETCH */}
+            {/* KHU VỰC GÓP Ý DƯỚI CÙNG TƯƠNG TÁC ONLINE */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full border-t border-cyan-500/10 pt-8 mt-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
               <div className="lg:col-span-5">
                 <form onSubmit={handleSendFeedback} className={`p-6 rounded-3xl border-2 shadow-xl space-y-4 ${isOcean ? 'bg-slate-950/40 border-cyan-500/30' : 'bg-white border-yellow-300'}`}>
@@ -609,24 +599,20 @@ const App: React.FC = () => {
         </div>
       </Layout>
 
-      {/* TÍCH HỢP TOÀN DIỆN CÁC FONT VÀ CSS OVERRIDE AN TOÀN TUYỆT ĐỐI */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Zeyada&family=Ruthie&display=swap');
-
         [class*="Couplet"], .fixed.w-12.text-center {
           font-family: 'Zeyada', 'Ruthie', cursive !important;
           font-size: 26px !important;
           line-height: 1.2 !important;
           letter-spacing: 2px !important;
         }
-
         nav, header, [class*="Navbar"], [class*="Header"], .navbar-container {
           display: none !important;
           height: 0 !important;
           opacity: 0 !important;
           pointer-events: none !important;
         }
-
         body, #root, .app-container { padding-top: 0 !important; margin-top: 0 !important; }
         .custom-scrollbar::-webkit-scrollbar{width:4px;}
         .custom-scrollbar::-webkit-scrollbar-track{background:transparent;}
