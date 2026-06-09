@@ -20,7 +20,7 @@ const MAX_FILES = 5;
 const STORAGE_KEY = 'len_don_cung_lam_history_v2';
 
 // ==========================================
-// THÔNG TIN API SUPABASE CHUẨN XÁC CỦA BẠN
+// THÔNG TIN API SUPABASE CHUẨN XÁC TRÊN MỘT DÒNG DUY NHẤT
 // ==========================================
 const SUPABASE_URL = "https://pfwcfbsobsitfocjcfxg.supabase.co"; 
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmd2NmaHNvYnNqdGZwY2pjZnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5OTI2MjcsImV4cCI6MjA5NjU2ODYyN30.aYskBWpE7ZxwoujAjEMfbUN1X1EQP1DK9QuhjW1zIyQ";
@@ -45,7 +45,9 @@ const DEFAULT_NOTICES: NoticeItem[] = [
   { id: 3, date: "01/06", title: "Nhập kho hàng hè mới", desc: "Kiểm đếm số lượng áo thun và váy hoa nhí vừa về." },
 ];
 
-// Bộ kết nối REST API Fetch độc lập cho Supabase không dùng npm ngoài
+// ==========================================
+// CÁC HÀM FETCH KẾT NỐI SUPABASE ĐÃ ĐƯỢC KHÔI PHỤC HOÀN TOÀN
+// ==========================================
 const sFetchGet = async () => {
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/feedbacks?select=*&order=timestamp.desc`, {
@@ -71,6 +73,127 @@ const sFetchPost = async (payload: any) => {
     });
     return res.ok;
   } catch (e) { return false; }
+};
+
+// 1. Hiệu ứng Giao diện Tết: Mưa hoa xuân phát quang
+const BioluminescentFlowersTet = () => {
+  const flowers = Array.from({ length: 30 }).map((_, i) => {
+    const isMai = Math.random() > 0.5;
+    return {
+      id: i, left: `${Math.random() * 100}%`,
+      animationDuration: `${7 + Math.random() * 6}s`, animationDelay: `${Math.random() * 5}s`,
+      color: isMai ? '#FDE047' : '#FBCFE8', centerColor: isMai ? '#EA580C' : '#BE185D',
+      size: Math.random() * 15 + 15, pulseDuration: `${2 + Math.random() * 2}s`
+    };
+  });
+  return (
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      {flowers.map(f => (
+        <div key={f.id} className="absolute -top-10 opacity-90" style={{ left: f.left, width: f.size, height: f.size, animation: `fall ${f.animationDuration} linear infinite, pulseBreath ${f.pulseDuration} ease-in-out infinite alternate`, animationDelay: `${f.animationDelay}, 0s` }}>
+          <svg className="w-full h-full animate-spin-slow" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 4px 8px rgba(234,179,8,0.4))' }}>
+            <path d="M50,15 C60,0 80,15 70,35 C85,25 100,45 80,60 C90,80 65,95 50,75 C35,95 10,80 20,60 C0,45 15,25 30,35 C20,15 40,0 50,15 Z" fill={f.color}/><circle cx="50" cy="48" r="12" fill={f.centerColor}/>
+          </svg>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// 2. Hiệu ứng Giao diện Biển: Bào tử phát quang sinh học
+const BioluminescenceSpores = () => {
+  const spores = Array.from({ length: 30 }).map((_, i) => ({
+    id: i, left: `${Math.random() * 100}%`, bottom: `${Math.random() * 100}%`,
+    size: Math.random() * 5 + 3, duration: `${3 + Math.random() * 4}s`, delay: `${Math.random() * 3}s`,
+    color: Math.random() > 0.5 ? '#22d3ee' : '#c026d3',
+  }));
+  return (
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden mix-blend-screen">
+      {spores.map(c => (
+        <div key={c.id} className="absolute rounded-full" style={{ left: c.left, bottom: c.bottom, width: c.size, height: c.size, backgroundColor: c.color, boxShadow: `0 0 ${c.size * 3}px ${c.size}px ${c.color}`, animation: `float-glow ${c.duration} ease-in-out infinite alternate, pulseBreath 2s ease-in-out infinite alternate`, animationDelay: c.delay }} />
+      ))}
+    </div>
+  );
+};
+
+// 3. Hiệu ứng Giao diện Biển: Màn nước sóng sánh nhòe 3D
+const WaterDistortionOverlay = () => (
+  <div className="fixed inset-0 pointer-events-none z-[1] mix-blend-overlay" style={{ animation: 'water-wave 8s ease-in-out infinite alternate', background: 'linear-gradient(180deg, rgba(34,211,238,0.03) 0%, rgba(30,58,138,0.03) 100%)' }} />
+);
+
+// 4. Hiệu ứng Chung: Bọt khí phụt từ con trỏ chuột
+const ClickBubbleBurst = () => {
+  const [bursts, setBursts] = useState<Array<{ id: number, x: number, y: number }>>([]);
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      const id = Date.now() + Math.random();
+      setBursts(prev => [...prev, { id, x: e.clientX, y: e.clientY }]);
+      setTimeout(() => setBursts(prev => prev.filter(b => b.id !== id)), 900);
+    };
+    window.addEventListener('click', handleClick);
+    return () => window.removeEventListener('click', handleClick);
+  }, []);
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden">
+      {bursts.map(b => (
+        <div key={b.id} className="absolute" style={{ left: b.x, top: b.y }}>
+          {Array.from({ length: 6 }).map((_, i) => {
+            const size = Math.random() * 8 + 4; const angle = (i * 60 * Math.PI) / 180; const distance = Math.random() * 35 + 15;
+            const tx = Math.cos(angle) * distance; const ty = Math.sin(angle) * distance - 40;
+            return (
+              <div key={i} className="absolute rounded-full bg-white/20 border border-white/60" style={{ width: size, height: size, transform: 'translate(-50%, -50%)', animation: 'bubble-burst-action 0.9s cubic-bezier(0.1, 0.8, 0.3, 1) forwards', style: { '--tx': `${tx}px`, '--ty': `${ty}px` } as any }} />
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// 5. Hiệu ứng Chung: "Bão Bong Bóng Ăn Mừng"
+const SuccessBubbleBlast: React.FC<{ trigger: boolean }> = ({ trigger }) => {
+  const [particles, setParticles] = useState<Array<{ id: number, left: string, size: number, delay: string, duration: string }>>([]);
+  useEffect(() => {
+    if (trigger) {
+      const newParticles = Array.from({ length: 75 }).map((_, i) => ({
+        id: Date.now() + i, left: `${15 + Math.random() * 70}%`, size: Math.random() * 22 + 8, delay: `${Math.random() * 0.8}s`, duration: `${1.5 + Math.random() * 2}s`
+      }));
+      setParticles(newParticles);
+      const timer = setTimeout(() => setParticles([]), 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [trigger]);
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[999] overflow-hidden">
+      {particles.map(p => (
+        <div key={p.id} className="absolute bottom-[-50px] rounded-full bg-cyan-200/20 border-2 border-white/60 backdrop-blur-[0.5px]" style={{ left: p.left, width: p.size, height: p.size, animation: `rise ${p.duration} cubic-bezier(0.2, 0.6, 0.4, 1) forwards`, animationDelay: p.delay, boxShadow: 'inset 0 0 10px rgba(255,255,255,0.5), 0 0 15px rgba(34,211,238,0.3)' }} />
+      ))}
+    </div>
+  );
+};
+
+// 6. ĐÀN CÁ CŨ NÂNG CẤP
+const InteractiveSwimmingFish = () => {
+  const [fishes, setFishes] = useState(() => 
+    Array.from({ length: 7 }).map((_, i) => ({
+      id: i, top: `${20 + Math.random() * 55}%`,
+      size: i % 3 === 0 ? Math.random() * 20 + 65 : Math.random() * 10 + 40,
+      duration: `${16 + Math.random() * 10}s`, delay: `${Math.random() * 6}s`,
+      direction: Math.random() > 0.5 ? 'swimLTR' : 'swimRTL', isScared: false, 
+    }))
+  );
+  const handleFishClick = (id: number) => {
+    setFishes(prev => prev.map(f => f.id === id ? { ...f, isScared: true } : f));
+    setTimeout(() => { setFishes(prev => prev.map(f => f.id === id ? { ...f, isScared: false } : f)); }, 2000);
+  };
+  return (
+    <div className="fixed inset-0 pointer-events-none z-10 overflow-hidden">
+      {fishes.map(f => (
+        <div key={f.id} onClick={() => handleFishClick(f.id)} className={`absolute cursor-pointer pointer-events-auto select-none transition-all duration-300 ${f.isScared ? 'animate-[fishWiggle_0.1s_infinite]' : 'animate-[fishWiggle_0.6s_ease-in-out_infinite]'}`} style={{ top: f.top, width: f.size, height: f.size / 2, animationName: f.direction, animationDuration: f.isScared ? `${parseFloat(f.duration) / 4}s` : f.duration, animationDelay: f.isScared ? '0s' : f.delay, animationTimingFunction: 'linear', animationIterationCount: 'infinite' }}>
+          <svg viewBox="0 0 100 50" fill="currentColor" style={{ transform: f.direction === 'swimLTR' ? 'scaleX(-1)' : 'none' }} className="w-full h-full text-cyan-500 drop-shadow-[0_4px_12px_rgba(6,182,212,0.4)]"><path d="M10,25 C30,10 70,10 90,25 C70,40 30,40 10,25 M90,25 L100,15 L95,25 L100,35 Z" /><circle cx="30" cy="22" r="3" fill="rgba(0,0,0,0.5)" /></svg>
+        </div>
+      ))}
+    </div>
+  );
 };
 
 const App: React.FC = () => {
@@ -116,7 +239,7 @@ const App: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // ĐÃ SỬA LỖI ĐỌC FILE: THÊM { header: 1 } ĐỂ KHÔNG BỊ CRASH TRẮNG TRANG WEB GỐC
+  // Đọc danh sách sản phẩm mẫu cố định
   useEffect(() => {
     const loadDefaultProducts = async () => {
       try {
@@ -279,7 +402,6 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* GIỮ NGUYÊN COMPONENT LAYOUT GỐC ĐỂ KHÔNG LỖI CHÂN TRANG */}
       <Layout theme={theme} toggleTheme={toggleTheme}>
         <div className="px-4 py-6 pt-10">
           <ClickBubbleBurst /><SuccessBubbleBlast trigger={showCelebrationBubbles} />
@@ -313,20 +435,17 @@ const App: React.FC = () => {
               <div className={`inline-flex items-center gap-2 px-6 py-1.5 rounded-full text-sm font-bold tracking-wide uppercase border shadow-lg transition-all duration-500 ${isOcean ? 'bg-slate-900/60 text-cyan-200 border-cyan-500/40 shadow-cyan-950/40' : 'bg-gradient-to-r from-yellow-105 via-yellow-100 to-amber-100 text-yellow-805 border-yellow-355 shadow-yellow-200/50'}`}>
                 {isOcean ? ( <> <span className="text-cyan-400 animate-pulse">🫧</span> Phiên Bản ĐÁY BIỂN <span className="text-cyan-400 animate-pulse">🫧</span> </> ) : ( <> <span className="text-yellow-600 animate-pulse">✨</span> Phiên Bản CÓ ĐƠN <span className="text-yellow-600 animate-pulse">✨</span> </> )}
               </div>
-              <h1 className={`text-5xl md:text-7xl font-black tracking-tight leading-none font-tet-title mt-4 text-transparent bg-clip-text bg-gradient-to-br animate-shimmer drop-shadow-lg transition-all duration-500 ${isOcean ? 'from-cyan-300 via-sky-100 to-teal-400' : 'from-yellow-500 via-yellow-300 to-amber-600'}`}>LÊN ĐƠN THÔI</h1>
+              <h1 className={`text-5xl md:text-7xl font-black tracking-tight leading-none font-tet-title mt-4 text-transparent bg-clip-text bg-gradient-to-br animate-shimmer drop-shadow-lg transition-all duration-500 ${isOcean ? 'from-cyan-300 via-sky-100 to-teal-400' : 'from-yellow-500 via-yellow-300 to-amber-600'}`}>\u004c\u004e\u0020\u0044\u00a0\u004e\u0020\u0054\u0048\u00d4\u0049</h1>
             </div>
 
-            {/* Platform Tabs */}
             <div className="flex justify-center">
-              <div className={`p-2 rounded-2xl flex gap-2 border transition-all duration-500 relative overflow-hidden ${isOcean ? 'bg-slate-900/60 backdrop-blur-md border-cyan-500/50 shadow-[0_0_25px_rgba(6,182,212,0.3)] shadow-[inset_0_2px_8px_rgba(6,182,212,0.1)]' : 'bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl border-2 border-yellow-300 shadow-inner'}`}>
-                {isOcean && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent" style={{ animation: 'scan-neon 3s linear infinite' }}></div>}
+              <div className={`p-2 rounded-2xl flex gap-2 border transition-all duration-500 relative overflow-hidden ${isOcean ? 'bg-slate-900/60 backdrop-blur-md border-cyan-500/50 shadow-[0_0_25px_rgba(6,182,212,0.3)] shadow-[inset_0_2px_8px_rgba(6,182,212,0.1)]' : 'bg-gradient-to-r from-yellow-50 to-amber-50 border-2 border-yellow-300 shadow-inner'}`}>
                 <button onClick={() => { setActivePlatform('shopee'); reset(); }} className={`px-8 py-3 rounded-xl font-bold text-lg transition-all border-2 duration-300 ${activePlatform === 'shopee' ? 'bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 text-white border-orange-400 shadow-lg scale-105' : (isOcean ? 'bg-slate-950/60 text-cyan-200 border-transparent hover:border-cyan-500/30' : 'bg-white text-orange-850 border-transparent')}`}>SHOPEE</button>
                 <button onClick={() => { setActivePlatform('tiktok'); reset(); }} className={`px-8 py-3 rounded-xl font-bold text-lg transition-all border-2 duration-300 ${activePlatform === 'tiktok' ? (isOcean ? 'bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 text-white border-cyan-455 shadow-lg scale-105' : 'bg-gradient-to-r from-slate-900 to-black text-white border-slate-700 shadow-lg scale-105') : (isOcean ? 'bg-slate-950/60 text-cyan-200 border-transparent hover:border-cyan-500/30' : 'bg-white text-slate-800 border-transparent')}`}>TIKTOK</button>
               </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
-              {/* NHẬT KÝ */}
               <div className="lg:col-span-4 space-y-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
                 <div className={`p-7 rounded-3xl border-2 transition-all duration-500 shadow-2xl hover:-translate-y-1 space-y-4 ${isOcean ? 'bg-slate-950/50 border-cyan-500/20 shadow-cyan-950/40 text-cyan-100' : 'bg-white border-yellow-200 shadow-yellow-100/50 text-amber-900'}`}>
                   <div className={`flex items-center justify-between border-b pb-3 ${isOcean ? 'border-cyan-500/30' : 'border-yellow-200'}`}>
@@ -351,9 +470,8 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              {/* THẢ FILE */}
               <div className="lg:col-span-8 space-y-6 order-1 lg:order-2 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                <div className={`p-2 rounded-[2.5rem] border-4 shadow-2xl overflow-hidden relative transition-all duration-500 ${isOcean ? 'bg-slate-950/50 border-cyan-500/30 shadow-cyan-950/30' : 'bg-white border-yellow-300 shadow-yellow-100/50'}`}>
+                <div className={`p-2 rounded-[2.5rem] border-4 shadow-2xl overflow-hidden relative transition-all duration-500 ${isOcean ? 'bg-slate-950/50 border-cyan-500/30' : 'bg-white border-yellow-300'}`}>
                   <div className="p-8 relative z-10">
                     {files.length < MAX_FILES && !processedFileUrl && (
                       <div onClick={() => fileInputRef.current?.click()} className={`border-2 border-dashed rounded-3xl p-16 flex flex-col items-center justify-center cursor-pointer transition-all mb-8 group relative overflow-hidden ${isOcean ? 'border-cyan-500/40 bg-cyan-950/15 hover:bg-cyan-950/25' : 'border-yellow-405 bg-yellow-50/30 hover:bg-yellow-50/60'}`}>
@@ -364,7 +482,6 @@ const App: React.FC = () => {
                       </div>
                     )}
 
-                    {/* LIST FILE */}
                     {files.length > 0 && (
                       <div className="space-y-4 mb-8">
                         <div className="flex items-center justify-between border-b pb-2 border-cyan-500/30">
@@ -372,7 +489,7 @@ const App: React.FC = () => {
                           {!processedFileUrl && <button onClick={reset} className="text-xs text-rose-450 font-bold">Hủy bỏ</button>}
                         </div>
                         {files.map((f, index) => (
-                          <div key={index} className={`flex items-center justify-between p-4 rounded-xl border group transition-colors animate-fade-in ${isOcean ? 'bg-cyan-950/40 border-cyan-500/20' : 'bg-yellow-50/40 border-yellow-250'}`}>
+                          <div key={index} className={`flex items-center justify-between p-4 rounded-xl border group transition-colors ${isOcean ? 'bg-cyan-950/40 border-cyan-500/20' : 'bg-yellow-50/40 border-yellow-250'}`}>
                             <span className="text-sm font-bold truncate max-w-[200px]">{f.name}</span>
                             {!processedFileUrl && <button onClick={() => removeFile(index)} className="text-rose-404 px-2 font-bold">Xóa</button>}
                           </div>
@@ -392,7 +509,7 @@ const App: React.FC = () => {
 
                     <div className="flex flex-col gap-4">
                       {state.status === 'idle' && files.length > 0 && (
-                        <button onClick={handleProcess} className="w-full py-5 rounded-2xl font-bold text-xl transition-all shadow-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 text-white border border-cyan-400">XỬ LÝ GỘP ĐƠN NGAY</button>
+                        <button onClick={handleProcess} className="w-full py-5 rounded-2xl font-bold text-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 text-white border border-cyan-400 shadow-xl">XỬ LÝ GỘP ĐƠN NGAY</button>
                       )}
                       {state.status === 'processing' && <div className="text-center py-12 text-cyan-400 animate-pulse font-bold tracking-widest uppercase text-sm">{state.message}</div>}
                       {state.status === 'success' && processedFileUrl && (
@@ -452,7 +569,6 @@ const App: React.FC = () => {
         </div>
       </Layout>
 
-      {/* TÍCH HỢP TOÀN DIỆN CÁC FONT VÀ CSS OVERRIDE */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Zeyada&family=Ruthie&display=swap');
         [class*="Couplet"], .fixed.w-12.text-center {
